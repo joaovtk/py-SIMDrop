@@ -1,6 +1,6 @@
 import threading
-from main import telegram_bot
-from server import flask_app
+from src.main import telegram_bot
+from src.server import flask_app
 
 # Função para rodar ambos no mesmo processo
 def main():

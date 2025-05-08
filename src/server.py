@@ -1,4 +1,3 @@
-import logging
 import paypalrestsdk
 from flask import Flask, request, jsonify
 from dotenv import dotenv_values
@@ -29,19 +28,15 @@ app = Flask(__name__)
 # Função para processar o pagamento após sucesso
 @app.route('/payment-success', methods=['POST'])
 def payment_success():
-    # Verificar se a requisição é do PayPal
     data = request.json
     payment_id = data.get('payment_id')
     payer_id = data.get('payer_id')
 
-    # Verificar se o pagamento foi confirmado
     payment = paypalrestsdk.Payment.find(payment_id)
 
     if payment.state == "approved":
-        # Sucesso no pagamento, adicione saldo ao usuário
-        user_id = payer_id  # Usando payer_id como ID do usuário (ajuste conforme necessário)
+        user_id = payer_id  # Usando payer_id como ID do usuário
         user_balances[user_id] = user_balances.get(user_id, 0) + 10  # Adiciona R$10 ao saldo do usuário
-
         return jsonify({'status': 'Pagamento bem-sucedido', 'balance': user_balances[user_id]})
 
     return jsonify({'status': 'Erro ao processar pagamento'}), 400
@@ -51,5 +46,6 @@ def payment_success():
 def payment_cancel():
     return jsonify({'status': 'Pagamento cancelado, tente novamente mais tarde'}), 400
 
-if __name__ == '__main__':
+# Função para rodar o Flask
+def flask_app():
     app.run(port=5000)

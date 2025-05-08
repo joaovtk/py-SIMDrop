@@ -3,7 +3,6 @@ import paypalrestsdk
 from telegram import Update
 from telegram.ext import Application, CommandHandler, ContextTypes
 from dotenv import dotenv_values
-import requests
 
 # Carregar variáveis de ambiente
 env = dotenv_values(".env")
@@ -40,28 +39,20 @@ async def check_balance(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def generate_payment_link(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.message.from_user.id
 
-    # Cria uma transação de pagamento com o PayPal
     payment = paypalrestsdk.Payment({
         "intent": "sale",
-        "payer": {
-            "payment_method": "paypal"
-        },
+        "payer": {"payment_method": "paypal"},
         "transactions": [{
-            "amount": {
-                "total": "10.00",  # Valor que o usuário irá pagar
-                "currency": "BRL"
-            },
+            "amount": {"total": "10.00", "currency": "BRL"},
             "description": "Recarregar saldo no bot"
         }],
         "redirect_urls": {
-            "return_url": "http://localhost:5000/payment-success",  # URL para onde o usuário será redirecionado após o pagamento
-            "cancel_url": "http://localhost:5000/payment-cancel"  # URL para onde o usuário será redirecionado se o pagamento for cancelado
+            "return_url": "http://localhost:5000/payment-success",
+            "cancel_url": "http://localhost:5000/payment-cancel"
         }
     })
 
-    # Cria o pagamento no PayPal
     if payment.create():
-        # Envia ao usuário o link de pagamento
         approval_url = next(link.href for link in payment.links if link.rel == "approval_url")
         await update.message.reply_text(f"Por favor, efetue o pagamento clicando no link abaixo:\n{approval_url}")
     else:
@@ -72,34 +63,28 @@ async def buy_number(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.message.from_user.id
     balance = user_balances.get(user_id, 0)
 
-    # Verifica se o usuário tem saldo suficiente
     if balance < 10:
         await update.message.reply_text("Você não tem saldo suficiente para comprar um número virtual. Recarregue seu saldo.")
         return
 
-    # Deduz o valor necessário para gerar o número
     user_balances[user_id] -= 10
-
-    # Gerar número virtual - Simulação de resposta
     await update.message.reply_text(f"Seu número virtual foi gerado: +1 234 567 890")
+
+async def help(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await update.message.reply_text("Comandos Disponiveis: \n/ajuda- Este Comando\n/start - Comando de inicilização\n/saldo - Ve seu saldo\n/recarregar - Reccarega seu saldo\n/Comprar - Compra o numero")
 
 # Função de comando "/start"
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text("Bem-vindo! Use /comprar para obter um número virtual. Seu saldo será descontado.")
 
 # Função principal que configura o bot
-def main():
-    # Cria o application com o seu token
+def telegram_bot():
     application = Application.builder().token(TOKEN).build()
 
-    # Comandos
     application.add_handler(CommandHandler("start", start))
     application.add_handler(CommandHandler("comprar", buy_number))
     application.add_handler(CommandHandler("saldo", check_balance))
     application.add_handler(CommandHandler("recarregar", generate_payment_link))
+    application.add_handler(CommandHandler("ajuda", help))
 
-    # Inicia o bot
     application.run_polling()
-
-if __name__ == '__main__':
-    main()

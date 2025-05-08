@@ -48,4 +48,4 @@ def payment_cancel():
 
 # Função para rodar o Flask
 def flask_app():
-    app.run(port=5000)
+    app.run(env["HOST"])

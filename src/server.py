@@ -6,7 +6,7 @@ from dotenv import dotenv_values
 env = dotenv_values(".env")
 
 # Credenciais do PayPal
-PAYPAL_CLIENT_ID = env['PAYPAL_CLIENT_ID']
+PAYPAL_CLIENT_ID = env['CLIENT_ID']
 PAYPAL_SECRET = env['PAYPAL_SECRET']
 
 # Inicializar o PayPal SDK

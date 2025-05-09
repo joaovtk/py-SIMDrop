@@ -4,7 +4,6 @@ from dotenv import dotenv_values, load_dotenv
 import os
 
 # Carregar variáveis de ambiente
-env = dotenv_values(".env")
 
 # Credenciais do PayPal
 
@@ -16,13 +15,6 @@ if env:
     # Token do bot do Telegram
     TOKEN = os.getenv("TOKEN")
     HOST = os.getenv("HOST")
-else:
-    PAYPAL_CLIENT_ID = env['CLIENT_ID']
-    PAYPAL_SECRET = env['PAYPAL_SECRET']
-
-    # Token do bot do Telegram
-    TOKEN = env['TOKEN']
-    HOST = env["HOST"]
 
 # Inicializar o PayPal SDK
 paypalrestsdk.configure({

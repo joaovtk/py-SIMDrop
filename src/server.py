@@ -23,7 +23,7 @@ paypalrestsdk.configure({
 })
 
 # URL do webhook (para confirmar o pagamento)
-PAYPAL_WEBHOOK_URL = env['PAYPAL_WEBHOOK_URL']
+PAYPAL_WEBHOOK_URL =  os.getenv("PAYPAL_WEBHOOK_URL")
 
 # Dicionário para armazenar o saldo dos usuários (por ID)
 user_balances = {}

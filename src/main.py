@@ -72,7 +72,15 @@ async def buy_number(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(f"Seu número virtual foi gerado: +1 234 567 890")
 
 async def help(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.message.reply_text("Comandos Disponiveis: \n/ajuda- Este Comando\n/start - Comando de inicilização\n/saldo - Ve seu saldo\n/recarregar - Reccarega seu saldo\n/Comprar - Compra o numero")
+    await update.message.reply_text(
+    "Comandos disponíveis:\n"
+    "/ajuda - Mostra esta lista de comandos\n"
+    "/start - Inicia o bot\n"
+    "/saldo - Ver seu saldo\n"
+    "/recarregar - Recarregar saldo\n"
+    "/comprar - Comprar número"
+)
+
 
 # Função de comando "/start"
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):

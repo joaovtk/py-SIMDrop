@@ -1,13 +1,28 @@
 import paypalrestsdk
 from flask import Flask, request, jsonify
-from dotenv import dotenv_values
+from dotenv import dotenv_values, load_dotenv
+import os
 
 # Carregar variáveis de ambiente
 env = dotenv_values(".env")
 
 # Credenciais do PayPal
-PAYPAL_CLIENT_ID = env['CLIENT_ID']
-PAYPAL_SECRET = env['PAYPAL_SECRET']
+
+if env:
+    load_dotenv()
+    PAYPAL_CLIENT_ID =  os.getenv("CLIENT_ID")
+    PAYPAL_SECRET = os.getenv("PAYPAL_SECRET")
+
+    # Token do bot do Telegram
+    TOKEN = os.getenv("TOKEN")
+    HOST = os.getenv("HOST")
+else:
+    PAYPAL_CLIENT_ID = env['CLIENT_ID']
+    PAYPAL_SECRET = env['PAYPAL_SECRET']
+
+    # Token do bot do Telegram
+    TOKEN = env['TOKEN']
+    HOST = env["HOST"]
 
 # Inicializar o PayPal SDK
 paypalrestsdk.configure({
@@ -48,4 +63,4 @@ def payment_cancel():
 
 # Função para rodar o Flask
 def flask_app():
-    app.run(env["HOST"])
+    app.run(HOST)

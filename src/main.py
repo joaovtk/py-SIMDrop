@@ -2,19 +2,29 @@ import logging
 import paypalrestsdk
 from telegram import Update
 from telegram.ext import Application, CommandHandler, ContextTypes
-from dotenv import dotenv_values
+from dotenv import dotenv_values, load_dotenv
+import os
 
 # Carregar variáveis de ambiente
 env = dotenv_values(".env")
 
+if env:
+    load_dotenv()
+    PAYPAL_CLIENT_ID =  os.getenv("CLIENT_ID")
+    PAYPAL_SECRET = os.getenv("PAYPAL_SECRET")
+
+    # Token do bot do Telegram
+    TOKEN = os.getenv("TOKEN")
+else:
+    PAYPAL_CLIENT_ID = env['CLIENT_ID']
+    PAYPAL_SECRET = env['PAYPAL_SECRET']
+
+    # Token do bot do Telegram
+    TOKEN = env['TOKEN']
+
 print(env)
 
 # Credenciais do PayPal
-PAYPAL_CLIENT_ID = env['CLIENT_ID']
-PAYPAL_SECRET = env['PAYPAL_SECRET']
-
-# Token do bot do Telegram
-TOKEN = env['TOKEN']
 
 # Dicionário para armazenar o saldo dos usuários (por ID)
 user_balances = {}

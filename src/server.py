@@ -14,6 +14,7 @@ PAYPAL_SECRET = os.getenv("PAYPAL_SECRET")
 # Token do bot do Telegram
 TOKEN = os.getenv("TOKEN")
 HOST = os.getenv("HOST")
+PORT = 5000
 
 # Inicializar o PayPal SDK
 paypalrestsdk.configure({
@@ -54,4 +55,4 @@ def payment_cancel():
 
 # Função para rodar o Flask
 def flask_app():
-    app.run(HOST)
+    app.run(HOST, port=PORT)

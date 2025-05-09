@@ -13,8 +13,8 @@ PAYPAL_SECRET = os.getenv("PAYPAL_SECRET")
 
 # Token do bot do Telegram
 TOKEN = os.getenv("TOKEN")
-HOST = os.getenv("HOST")
-PORT = 5000
+HOST = "localhost"
+PORT = 8080
 
 # Inicializar o PayPal SDK
 paypalrestsdk.configure({

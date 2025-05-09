@@ -6,15 +6,14 @@ import os
 # Carregar variáveis de ambiente
 
 # Credenciais do PayPal
+load_dotenv()
 
-if env:
-    load_dotenv()
-    PAYPAL_CLIENT_ID =  os.getenv("CLIENT_ID")
-    PAYPAL_SECRET = os.getenv("PAYPAL_SECRET")
+PAYPAL_CLIENT_ID =  os.getenv("CLIENT_ID")
+PAYPAL_SECRET = os.getenv("PAYPAL_SECRET")
 
-    # Token do bot do Telegram
-    TOKEN = os.getenv("TOKEN")
-    HOST = os.getenv("HOST")
+# Token do bot do Telegram
+TOKEN = os.getenv("TOKEN")
+HOST = os.getenv("HOST")
 
 # Inicializar o PayPal SDK
 paypalrestsdk.configure({

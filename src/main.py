@@ -7,6 +7,8 @@ from dotenv import dotenv_values
 # Carregar variáveis de ambiente
 env = dotenv_values(".env")
 
+print(env)
+
 # Credenciais do PayPal
 PAYPAL_CLIENT_ID = env['CLIENT_ID']
 PAYPAL_SECRET = env['PAYPAL_SECRET']

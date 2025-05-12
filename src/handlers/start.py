@@ -47,21 +47,21 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         mensagem_boas_vindas,
         reply_markup=InlineKeyboardMarkup([
             [
-                InlineKeyboardButton("📱 Escolher serviço", callback_data="serv"),
-                InlineKeyboardButton("🌍 Escolher país", callback_data="pais")
+                InlineKeyboardButton("Escolher Serviço", callback_data="serv"),
+                InlineKeyboardButton("Escolher País", callback_data="pais")
             ],
             [
-                InlineKeyboardButton("💰 Ver saldo", callback_data="saldo"),
-                InlineKeyboardButton("🔃 Fazer Recarga de Saldo", callback_data="recarregar")
+                InlineKeyboardButton("Ver Saldo", callback_data="saldo"),
+                InlineKeyboardButton("Fazer Recarga de Saldo", callback_data="recarregar")
             ],
             [
-                InlineKeyboardButton("📣 Comprar Número", callback_data="sms"),
-                InlineKeyboardButton("✅ Checar Números", callback_data="ativar")
+                InlineKeyboardButton("Comprar Número", callback_data="sms"),
+                InlineKeyboardButton("Checar Números", callback_data="ativar")
             ],
 
             [
-                InlineKeyboardButton("ℹ️ Ajuda", callback_data="ajuda"),
-                InlineKeyboardButton("❔ Duvidas ", callback_data="duvidas")
+                InlineKeyboardButton("Ajuda/FAQ", callback_data="ajuda"),
+                InlineKeyboardButton("Duvidas ", callback_data="duvidas")
             ]
         ]),
             parse_mode=ParseMode.MARKDOWN
@@ -70,22 +70,22 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.callback_query.edit_message_text(
         mensagem_boas_vindas,
         reply_markup=InlineKeyboardMarkup([
-            [
-                InlineKeyboardButton("📱 Escolher serviço", callback_data="serv"),
-                InlineKeyboardButton("🌍 Escolher país", callback_data="pais")
+             [
+                InlineKeyboardButton("Escolher Serviço", callback_data="serv"),
+                InlineKeyboardButton("Escolher País", callback_data="pais")
             ],
             [
-                InlineKeyboardButton("💰 Ver saldo", callback_data="saldo"),
-                InlineKeyboardButton("🔃 Fazer Recarga de Saldo", callback_data="recarregar")
+                InlineKeyboardButton("Ver Saldo", callback_data="saldo"),
+                InlineKeyboardButton("Fazer Recarga de Saldo", callback_data="recarregar")
             ],
             [
-                InlineKeyboardButton("📣 Comprar Número", callback_data="sms"),
-                InlineKeyboardButton("✅ Checar Números", callback_data="ativar")
+                InlineKeyboardButton("Comprar Número", callback_data="sms"),
+                InlineKeyboardButton("Checar Números", callback_data="ativar")
             ],
 
             [
-                InlineKeyboardButton("ℹ️ Ajuda", callback_data="ajuda"),
-                InlineKeyboardButton("❔ Duvidas ", callback_data="duvidas")
+                InlineKeyboardButton("Ajuda/FAQ", callback_data="ajuda"),
+                InlineKeyboardButton("Duvidas ", callback_data="duvidas")
             ]
         ]),
         parse_mode=ParseMode.MARKDOWN

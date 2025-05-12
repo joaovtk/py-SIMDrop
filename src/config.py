@@ -7,14 +7,14 @@ if STATUS != "DEV":
     TOKEN_TELEGRAM = os.getenv("TOKEN")
     API_SMS_ACTIVATE_KEY = os.getenv("SMS_API_KEY")
     URL_SMS_ACTIVATE_API = os.getenv("SMS_API_URL")
-    ABACATE_TOKEN = os.getenv("ABACATE_TOKEN")
+    PIX_UP = os.getenv("ABACATE_TOKEN")
 else:
     env = dotenv_values(".env")
     STATUS = env["STATUS"]
     TOKEN_TELEGRAM = env["TOKEN"]
     API_SMS_ACTIVATE_KEY = env["SMS_API_KEY"]
     URL_SMS_ACTIVATE_API = env["SMS_API_URL"]
-    ABACATE_TOKEN = env["ABACATE_TOKEN"]
+    PIX_UP = env["ABACATE_TOKEN"]
 PEDIR_CPF = 1
 CONCLUIDO = 2
 PAISES_VALIDOS = {

@@ -96,28 +96,32 @@ async def comprar(update: Update, context: CallbackContext):
 
 
     qrcode_url = await gerar_qrcode_pix(pedido_id, update)
-    pedidos[pedido_id]["mp_preferencia_url"] = qrcode_url
-
-    # Enviar confirmação ao usuário
-    if update.message:
-        await update.message.reply_text(
-        f"🧾 Pedido {pedido_id} criado com sucesso!\n\n"
-        f"📱 Serviço: {servico_info['serviceDescription']}\n"
-        f"🌍 País: {pais}\n"
-        f"🔢 Quantidade: 1\n"  # Exemplo de 1 unidade
-        f"💰 Total: ${preco_total:.2f}\n\n"
-        f"✅ Para pagar, escaneie o QR Code PIX ou clique no link abaixo:\n\nℹ️ Lembre-se de inserir telefone e email no link\n\n{qrcode_url}",
-    )
-        
+    if qrcode_url == "None":
+        time.sleep(5)
+        await start(update, context)
     else:
-        await update.callback_query.edit_message_text(
-        f"🧾 Pedido {pedido_id} criado com sucesso!\n\n"
-        f"📱 Serviço: {servico_info['serviceDescription']}\n"
-        f"🌍 País: {pais}\n"
-        f"💵 Preço Unitário: ${preco_unitario:.2f}\n"
-        f"🔢 Quantidade: 1\n"  # Exemplo de 1 unidade
-        f"💰 Total: ${preco_total:.2f}\n\n"
-        f"✅ Para pagar, escaneie o QR Code PIX ou clique no link abaixo:\n{qrcode_url}",
+        pedidos[pedido_id]["mp_preferencia_url"] = qrcode_url
 
-    )
+        # Enviar confirmação ao usuário
+        if update.message:
+            await update.message.reply_text(
+            f"🧾 Pedido {pedido_id} criado com sucesso!\n\n"
+            f"📱 Serviço: {servico_info['serviceDescription']}\n"
+            f"🌍 País: {pais}\n"
+            f"🔢 Quantidade: 1\n"  # Exemplo de 1 unidade
+            f"💰 Total: ${preco_total:.2f}\n\n"
+            f"✅ Para pagar, escaneie o QR Code PIX ou clique no link abaixo:\n\nℹ️ Lembre-se de inserir telefone e email no link\n\n{qrcode_url}",
+        )
+            
+        else:
+            await update.callback_query.edit_message_text(
+            f"🧾 Pedido {pedido_id} criado com sucesso!\n\n"
+            f"📱 Serviço: {servico_info['serviceDescription']}\n"
+            f"🌍 País: {pais}\n"
+            f"💵 Preço Unitário: ${preco_unitario:.2f}\n"
+            f"🔢 Quantidade: 1\n"  # Exemplo de 1 unidade
+            f"💰 Total: ${preco_total:.2f}\n\n"
+            f"✅ Para pagar, escaneie o QR Code PIX ou clique no link abaixo:\n{qrcode_url}",
+
+        )
 

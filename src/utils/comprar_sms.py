@@ -36,18 +36,19 @@ async def comprar_sms_sms_pva(service_id, quantidade, pais, update: Update):
         
         # Ativando o SMS com o orderid
         if update.message:
-            await update.message.reply_text("Validando o Numero Logo ele será seu...")
+            await update.message.reply_text("🚀 Validando seu número... já já ele é seu!")
+
         else:
-            update.callback_query.edit_message_text("Validando o Numero Logo ele será seu...")
+            await update.message.reply_text("🚀 Validando seu número... já já ele é seu!")
         sucesso, code = await ativar_sms(orderid)
         
         if sucesso:
             # Retorna o sucesso da ativação junto com o número e a mensagem
-            return True, numero, code
+            return {"status": True, "number": numero, "code": code}
         else:
             # Retorna erro caso a ativação falhe
-            return False, numero, code
+            return {}
 
     except requests.exceptions.RequestException as e:
         logger.error(f"Erro na API SMS-PVA: {e}")
-        return False, str(e), None
+        return {}

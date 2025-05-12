@@ -10,6 +10,7 @@ from utils.comprar import comprar
 from utils.comprar_sms import comprar_sms_sms_pva
 from handlers.start import start
 from handlers.ajuda import ajuda
+from telegram.constants import ParseMode
 
 async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
@@ -166,10 +167,12 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         print(resultado)
         if resultado:
             saldo = resultado[0]
+            keyboard = [
+                    [InlineKeyboardButton("👟 Voltar ao menu Start", callback_data="exit")]
+                ]
+            markup = InlineKeyboardMarkup(keyboard)
+            await query.edit_message_text(f"💰 Seu saldo é de `{saldo:.2f} BRL`", parse_mode="Markdown", reply_markup=markup)
 
-            await query.edit_message_text(f"💰 Seu saldo é de {saldo:.2f} BRL", parse_mode="Markdown")
-            time.sleep(3.5)
-            await start(update, context)
         else:
             await query.edit_message_text("❌ Usuário não encontrado ou saldo indisponível.")
             time.sleep(3.5)
@@ -180,14 +183,46 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     elif query.data == "sms":
         res = con.execute(f"SELECT * FROM user WHERE userid = {update.effective_user.id}")
         res = res.fetchone()
-        if res[0]:
-            code, numero = str(await comprar_sms_sms_pva(res[1], 1, res[2], update))
-            cursor.execute("CREATE TABLE IF NOT EXISTS numeros (userid INT, numero VARCHAR(20), code VARCHAR(20))")
-            cursor.executemany("INSERT INTO numeros VALUES (?, ?, ?)", update.effective_user.id, numero, code)
+        print(res)
+        if res[1] == "None" and res[2] == "None":
+            if update.message:
+                await update.message.reply_text("Selecione o pais e o Serviço padrão no menu /start")
+            else:
+                await update.callback_query.edit_message_text("Selecione o pais e o Serviço padrão no menu start")
+        else:
+            if res[3] > 0.0:
+                response = str(await comprar_sms_sms_pva(res[1], 1, res[2], update))
+                print(response)
+                if (response):
+                    if update.message:
+                        await update.message.reply_text("Houve um erro no processo de compra de numero")
+                    else:
+                        await update.callback_query.edit_message_text("Houve um erro no processo de compra de numero")
+                else:
+                    keyboard = [
+                        [InlineKeyboardButton("👟 Voltar ao menu Start", callback_data="exit")]
+                    ]
+                    markup = InlineKeyboardMarkup(keyboard)
+                    cursor.execute("CREATE TABLE IF NOT EXISTS numeros (userid INT, numero VARCHAR(20), code VARCHAR(20))")
+                    cursor.executemany("INSERT INTO numeros VALUES (?, ?, ?)", update.effective_user.id, response["numero"], response["code"])
+                    if update.message:
+                        await update.message.reply_text("✅ Numero Comprado Com sucesso", reply_markup=markup)
+                    else:
+                        await update.callback_query.edit_message_text("✅ Numero Comprado Com sucesso\nFoi debitado do saldo 1 real", reply_markup=markup)
+            else:
+                keyboard = [
+                    [InlineKeyboardButton("👟 Voltar ao menu Start", callback_data="exit")]
+                ]
+                markup = InlineKeyboardMarkup(keyboard)
+                await update.callback_query.edit_message_text("💵 Você não tem saldo no banco de dados volte para `/start` para adicionar saldo via pix ", parse_mode=ParseMode.MARKDOWN, reply_markup=markup)
     elif query.data == "ativar":
         cursor.execute("CREATE TABLE IF NOT EXISTS numeros (userid INT, numero VARCHAR(20), code VARCHAR(20))")
         res = cursor.execute(f"SELECT * FROM numeros WHERE userid = {update._effective_user.id}")
         res = res.fetchall()
+        keyboard = [
+                [InlineKeyboardButton("👟 Voltar ao menu Start", callback_data="exit")]
+            ]
+        markup = InlineKeyboardMarkup(keyboard)
         if res:
             txt = ""
 
@@ -196,13 +231,22 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             if update.message:
                 await update.message.reply_text(txt)
             else:
-                await update.callback_query.edit_message_text(txt)
+                await update.callback_query.edit_message_text(txt, reply_markup=markup)
         else:
-            txt = "Não há numeros comprados"
+            txt = "❌ Não há numeros comprados"
             if update.message:
                 await update.message.reply_text(txt)
             else:
-                await update.callback_query.edit_message_text(txt)
+                await update.callback_query.edit_message_text(txt, reply_markup=markup)
+            
+    elif query.data == "duvidas":
+        keyboard = [
+            [InlineKeyboardButton("👟 Voltar ao menu Start", callback_data="exit")]
+        ]
+        markup = InlineKeyboardMarkup(keyboard)
+        await update.callback_query.edit_message_text("📚 *Central de Dúvidas - Suporte ao Usuário*\n\n🔹 *1. Como funciona a compra de número virtual?* Você escolhe o serviço (ex: WhatsApp, Telegram), o país desejado e realiza o pagamento. Após o pagamento ser confirmado, um número virtual será entregue automaticamente.\n\n🔹 *2. Quais serviços estão disponíveis?* Atualmente suportamos: WhatsApp, Telegram, Google, Instagram, Facebook, TikTok e outros. Verifique a lista atualizada no comando /servicos.\n\n🔹 *3. Como faço um pagamento?* Aceitamos Pix via QR Code. Você verá os dados de pagamento após escolher o serviço e o país no Botão **Comprar Numero**\n\n🔹 *4. Quanto tempo demora para receber o número?* Geralmente, o número é entregue em poucos segundos após o pagamento. Em casos raros, pode levar até 2 minutos.\n\n🔹 *5. E se o número não receber o SMS?* Se o número não receber o SMS em até 10 minutos você deve entrar em contato com o suporte.\n\n🔹 *6. O que acontece se eu pagar e não usar o número?* Você pode manter o saldo no bot para usar depois. Mas os números entregues não podem ser reutilizados ou trocados após gerados.\n\n🔹 *7. Como posso ver meu saldo?* Use o /start e use o botão **Ver Saldo**\n\n❓ *Ainda com dúvidas?* Entre em contato com o suporte ou envie uma mensagem aqui mesmo. Estamos prontos para te ajudar!", parse_mode="Markdown", reply_markup=markup)
+    elif query.data == "exit":
+        await start(update, context)
     elif query.data == "ajuda":
         await ajuda(update, context)
         

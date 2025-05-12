@@ -29,7 +29,8 @@ async def processar_cpf(update: Update, context: CallbackContext):
         "📣 `Comprar Número` — Adquira um número virtual disponível pela API da SMS-PVA.\n\n"
     )
 
-    await update.callback_query.edit_message_text(
+    if update.message:
+         await update.message.reply_text(
             mensagem_boas_vindas,
             reply_markup=InlineKeyboardMarkup([
                 [
@@ -51,6 +52,30 @@ async def processar_cpf(update: Update, context: CallbackContext):
                 ]
         ])
     )
+    else:
+         await update.callback_query.edit_message_text(
+            mensagem_boas_vindas,
+            reply_markup=InlineKeyboardMarkup([
+                [
+                    InlineKeyboardButton("📱 Escolher serviço", callback_data="serv"),
+                    InlineKeyboardButton("🌍 Escolher país", callback_data="pais")
+                ],
+                [
+                    InlineKeyboardButton("💰 Ver saldo", callback_data="saldo"),
+                    InlineKeyboardButton("🔃 Fazer Recarga de Saldo", callback_data="recarregar")
+                ],
+                [
+                    InlineKeyboardButton("📣 Comprar Número", callback_data="sms"),
+                    InlineKeyboardButton("✅ Checar Números", callback_data="ativar")
+                ],
+
+                [
+                    InlineKeyboardButton("ℹ️ Ajuda", callback_data="ajuda"),
+                    InlineKeyboardButton("❔ Duvidas ", callback_data="duvidas")
+                ]
+        ])
+    )
+
 
     return CONCLUIDO
 

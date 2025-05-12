@@ -1,6 +1,6 @@
 from dotenv import dotenv_values, load_dotenv
 import os
-STATUS = "DEV"
+STATUS = "PROD"
 if STATUS != "DEV":
     load_dotenv()
     TOKEN_TELEGRAM = os.getenv("TOKEN")

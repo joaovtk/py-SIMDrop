@@ -18,7 +18,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     con.commit()
 
     user_id = update.effective_user.id
-    cursor.execute("SELECT EXISTS(SELECT 1 FROM user WHERE userid = ?)", (user_id,))
+    cursor.execute(f"SELECT * FROM user WHERE userid = {user_id}")
     user_exists = cursor.fetchone()[0]
 
     if not user_exists:

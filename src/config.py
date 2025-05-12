@@ -3,12 +3,14 @@ import os
 STATUS = "PROD"
 if STATUS != "DEV":
     load_dotenv()
+    STATUS = os.getenv("STATUS")
     TOKEN_TELEGRAM = os.getenv("TOKEN")
     API_SMS_ACTIVATE_KEY = os.getenv("SMS_API_KEY")
     URL_SMS_ACTIVATE_API = os.getenv("SMS_API_URL")
     ABACATE_TOKEN = os.getenv("ABACATE_TOKEN")
 else:
     env = dotenv_values(".env")
+    STATUS = env["STATUS"]
     TOKEN_TELEGRAM = env["TOKEN"]
     API_SMS_ACTIVATE_KEY = env["SMS_API_KEY"]
     URL_SMS_ACTIVATE_API = env["SMS_API_URL"]

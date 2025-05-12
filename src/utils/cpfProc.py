@@ -17,13 +17,39 @@ async def processar_cpf(update: Update, context: CallbackContext):
     con.commit()
 
     # Envia uma única vez a mensagem de sucesso com o botão de escolha
-    await update.message.reply_text(
-        "✅ CPF registrado com sucesso! Agora, escolha um serviço para comprar números virtuais.",
-        reply_markup=InlineKeyboardMarkup([
-            [InlineKeyboardButton("📱 Escolher serviço", callback_data="serv")],
-            [InlineKeyboardButton("🌍 Escolher país", callback_data="pais")],
-            [InlineKeyboardButton("💰 Ver saldo", callback_data="saldo")],
-            [InlineKeyboardButton("🔃 Recarregar", callback_data="recarregar")],
+    
+    mensagem_boas_vindas = (
+        f"👋 Olá novamente, {update.effective_user.first_name}!\n\n"
+        "🫂 Seu cadastro já está ativo no sistema.\n\n"
+        "Use os botões abaixo para navegar pelas opções disponíveis. Aqui está uma breve explicação de cada função:\n\n"
+        "📱 `Escolher Serviço` — Selecione um serviço como *Google*, *WhatsApp*, entre outros.\n\n"
+        "🌍 `Escolher País` — Escolha o país de origem do número, como *Brasil* ou *Estados Unidos*.\n\n"
+        "🔃 `*Fazer Recarga de Saldo*` — Adicione créditos à sua conta para comprar números.\n\n"
+        "✅ `Checar Números` — Verifique os números comprados e armazenados no banco de dados.\n\n"
+        "📣 `Comprar Número` — Adquira um número virtual disponível pela API da SMS-PVA.\n\n"
+        f"💸 `Saldo atual:` R$ {saldo[0]:.2f} BRL"
+    )
+
+    await update.callback_query.edit_message_text(
+            mensagem_boas_vindas,
+            reply_markup=InlineKeyboardMarkup([
+                [
+                    InlineKeyboardButton("📱 Escolher serviço", callback_data="serv"),
+                    InlineKeyboardButton("🌍 Escolher país", callback_data="pais")
+                ],
+                [
+                    InlineKeyboardButton("💰 Ver saldo", callback_data="saldo"),
+                    InlineKeyboardButton("🔃 Fazer Recarga de Saldo", callback_data="recarregar")
+                ],
+                [
+                    InlineKeyboardButton("📣 Comprar Número", callback_data="sms"),
+                    InlineKeyboardButton("✅ Checar Números", callback_data="ativar")
+                ],
+
+                [
+                    InlineKeyboardButton("ℹ️ Ajuda", callback_data="ajuda"),
+                    InlineKeyboardButton("❔ Duvidas ", callback_data="duvidas")
+                ]
         ])
     )
 

@@ -20,11 +20,11 @@ async def comprar_sms_sms_pva(service_id, quantidade, pais, update: Update):
         "Content-length": "2"
     }
 
-    url = f"{URL_SMS_ACTIVATE_API}/number/{params["country"]}/{params['service']}"
+    url = f"{  URL_SMS_ACTIVATE_API}/number/{params["country"]}/{params['service']}"
 
     try:
         print(params)
-        r = requests.get(, headers=header)
+        r = requests.get(url, headers=header)
         resultado = r.json()
 
         if 'error' in resultado:

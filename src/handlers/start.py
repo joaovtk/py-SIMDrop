@@ -19,7 +19,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     user_id = update.effective_user.id
     cursor.execute(f"SELECT * FROM user WHERE userid = {user_id}")
-    user_exists = cursor.fetchone()[0]
+    user_exists = cursor.fetchone()
 
     if not user_exists:
         cursor.execute(
@@ -48,7 +48,6 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "🔃 `*Fazer Recarga de Saldo*` — Adicione créditos à sua conta para comprar números.\n\n"
         "✅ `Checar Números` — Verifique os números comprados e armazenados no banco de dados.\n\n"
         "📣 `Comprar Número` — Adquira um número virtual disponível pela API da SMS-PVA.\n\n"
-        f"💸 `Saldo atual:` R$ {saldo[0]:.2f} BRL"
     )
 
     if update.message:

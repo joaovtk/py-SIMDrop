@@ -39,16 +39,8 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     saldo = cursor.execute("SELECT saldo FROM user WHERE userid = ?", (user_id,))
     saldo = saldo.fetchone()
 
-    mensagem_boas_vindas = (
-        f"👋 Olá novamente, {update.effective_user.first_name}!\n\n"
-        "🫂 Seu cadastro já está ativo no sistema.\n\n"
-        "Use os botões abaixo para navegar pelas opções disponíveis. Aqui está uma breve explicação de cada função:\n\n"
-        "📱 `Escolher Serviço` — Selecione um serviço como *Google*, *WhatsApp*, entre outros.\n\n"
-        "🌍 `Escolher País` — Escolha o país de origem do número, como *Brasil* ou *Estados Unidos*.\n\n"
-        "🔃 `*Fazer Recarga de Saldo*` — Adicione créditos à sua conta para comprar números.\n\n"
-        "✅ `Checar Números` — Verifique os números comprados e armazenados no banco de dados.\n\n"
-        "📣 `Comprar Número` — Adquira um número virtual disponível pela API da SMS-PVA.\n\n"
-    )
+    mensagem_boas_vindas = f"👋 Olá novamente, {update.effective_user.first_name}!\n\n🫂 Seu cadastro já está ativo no sistema.\n\nUse os botões abaixo para navegar pelas opções disponíveis. Aqui está uma breve explicação de cada função:\n\n📱 `Escolher Serviço` — Selecione um serviço como *Google*, *WhatsApp*, entre outros.\n\n 🌍 `Escolher País` — Escolha o país de origem do número, como *Brasil* ou *Estados Unidos*.\n\n🔃 `Fazer Recarga de Saldo` — Adicione créditos à sua conta para comprar números.\n\n✅ `Checar Números` — Verifique os números comprados e armazenados no banco de dados.\n\n 📣 `Comprar Número` — Adquira um número virtual disponível pela API da SMS-PVA.\n\n"
+    
 
     if update.message:
         await update.message.reply_text(

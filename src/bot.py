@@ -9,6 +9,7 @@ from handlers.buttonhandler import button_handler
 from handlers.debug import debug_add_saldo
 from handlers.start import start
 from handlers.ajuda import ajuda
+from handlers.drop import drop
 
 
 if __name__ == "__main__":
@@ -29,6 +30,7 @@ if __name__ == "__main__":
 
     if STATUS == "DEV":
         app.add_handler(CommandHandler("debugsaldo", debug_add_saldo))
+        app.add_handler(CommandHandler("drop", drop))
 
     # Registrar o handler de conversa
     app.add_handler(conv_handler)

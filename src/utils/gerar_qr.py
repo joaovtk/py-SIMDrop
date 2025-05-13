@@ -10,14 +10,11 @@ import datetime
 
 async def gerar_qrcode_pix(pedido_id, update: Update):
     url = "https://api.pixupbr.com/v2/pix/qrcode"  # URL fictícia de exemplo
-    cpf = con.execute(f"SELECT cpf FROM user WHERE userid = {update.effective_user.id}")
-    cpf = cpf.fetchone()
     # Ajustando o payload com os valores dinâmicos
     payload = {
         "amount": 1,    
         "payer": {
-            "name": update.effective_user.name,
-            "document": cpf
+            "name": update.effective_user.name
         },
         "postbackUrl": "http://localhost:5000/webhook/pixup"
     }

@@ -15,7 +15,6 @@ else:
     API_SMS_ACTIVATE_KEY = env["SMS_API_KEY"]
     URL_SMS_ACTIVATE_API = env["SMS_API_URL"]
     PIX_UP = env["ABACATE_TOKEN"]
-PEDIR_CPF = 1
 CONCLUIDO = 2
 PAISES_VALIDOS = {
     "BR": "Brasil",

@@ -84,14 +84,14 @@ async def comprar(update: Update, context: CallbackContext):
         "servico_opcao": service,
         "pais": pais
     }
-    cursor.execute("SELECT service, pais, cpf FROM user WHERE userid = ?", (user_id,))
+    cursor.execute("SELECT service, pais FROM user WHERE userid = ?", (user_id,))
     dados = cursor.fetchone()
 
     if not dados:
         await update.message.reply_text("❌ Usuário não encontrado. Use /start para se registrar.")
         return
 
-    service, pais, taxId = dados
+    service, pais = dados
 
 
 

@@ -15,7 +15,6 @@ from telegram.constants import ParseMode
 async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
-
     if query.data == "serv" or query.data.startswith("ser_"):
         # Pega ou inicializa a página atual
         pagina = context.user_data.get("pagina_serv", 0)
@@ -40,7 +39,7 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             keyboard.append([
                 InlineKeyboardButton(
                     f"{da['serviceDescription']}",
-                    callback_data=f"serv_{da['service']}"
+                    callback_data=f"serv_{da['service']}-{da["serviceDescription"]}-{da["price"]}"
                 )
             ])
 
@@ -57,16 +56,28 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await query.edit_message_text("https://api.smspva.com/activation/servicesprices\n\n📱 Escolha um serviço:", reply_markup=markup)
 
     elif query.data.startswith("serv_"):
-        service_id = query.data.replace("serv_", "")
+        res = query.data.replace("serv_", "")
+        res = res.split("-")
+        print(res)
+        service_id = res[0]
+        nome = res[1]
+        price = res[2]
+        
         cursor.execute("""
             CREATE TABLE IF NOT EXISTS user (
                 userid INTEGER PRIMARY KEY,
                 service TEXT DEFAULT 'None',
                 pais TEXT DEFAULT 'None',
-                saldo FLOAT DEFAULT 0.0,
-                cpf TEXT DEFAULT 'None'
+                saldo FLOAT DEFAULT 0.0
             )
         """)
+
+        keyboard = [
+            [InlineKeyboardButton("🌟 Favoritar", callback_data=f"favserv_{service_id}-{nome}-{price}")],
+            [InlineKeyboardButton("📣 Definir Como padrão", callback_data=f"setserv_{service_id}")],
+            [InlineKeyboardButton("👟 Voltar ao menu Start", callback_data="exit")]
+        ]
+        markup = InlineKeyboardMarkup(keyboard)
 
         cursor.execute("SELECT * FROM user WHERE userid = ?", (update.effective_user.id,))
         data = cursor.fetchone()
@@ -75,11 +86,8 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             cursor.execute("UPDATE user SET service = ? WHERE userid = ?", (service_id, update.effective_user.id))
         else:
             cursor.execute("INSERT INTO user VALUES (?, ?, ?, ?)", (update.effective_user.id, service_id, "None", 0))
-
         con.commit()
-        await query.edit_message_text(f"Serviço `{service_id}` salvo com sucesso!", parse_mode="Markdown")
-        time.sleep(3.5)
-        await start(update, context)
+        await query.edit_message_text(f"Nome do Serviço: {nome}\n\nPreço do serviço: ${price}\n\nPara salvar o serviço com padrão no botão Escolher Serviço\nPara favoritar clique no botão Favoritar", parse_mode="Markdown", reply_markup=markup)
     elif query.data.startswith("pais_") and not query.data.endswith("_next") and not query.data.endswith("_prev"):
 
         pais_id = query.data.replace("pais_", "")
@@ -89,23 +97,20 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 userid INTEGER PRIMARY KEY,
                 service TEXT DEFAULT 'None',
                 pais TEXT DEFAULT 'None',
-                saldo FLOAT DEFAULT 0.0,
-                cpf TEXT DEFAULT 'None'
+                saldo FLOAT DEFAULT 0.0
             )
+
         """)
+        con.commit()
+        keyboard = [
+            [InlineKeyboardButton("⭐ Favoritar", callback_data=f"fav_pais{pais_id}")],
+            [InlineKeyboardButton("📣 Definir Como padrão", callback_data=f"setpais_{pais_id}")]
+        ]
 
-        cursor.execute("SELECT * FROM user WHERE userid = ?", (update.effective_user.id,))
-        data = cursor.fetchone()
-
-        if data:
-            cursor.execute("UPDATE user SET pais = ? WHERE userid = ?", (pais_id, update.effective_user.id))
-        else:
-            cursor.execute("INSERT INTO user VALUES (?, ?, ?, ?)", (update.effective_user.id, "None", pais_id, 0))
+        markup = InlineKeyboardMarkup(keyboard)
 
         con.commit()
-        await query.edit_message_text(f"Pais `{pais_id}` salvo com sucesso!", parse_mode="Markdown")
-        time.sleep(3.5)
-        await start(update, context)
+        await query.edit_message_text(f"**Codigo do pais**: `{pais_id}`\n\n\n\n", parse_mode="Markdown", reply_markup=markup)
 
     elif query.data == "pais" or query.data.startswith("pais_"):
         # Lista de países com códigos ISO
@@ -249,4 +254,142 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await start(update, context)
     elif query.data == "ajuda":
         await ajuda(update, context)
+
+    elif query.data == "erase":
+        if context.user_data.get("msg_user_id"):
+            await update.callback_query.delete_message()
+            await context.bot.delete_message(chat_id=update.effective_chat.id, message_id=context.user_data.get("msg_user_id"))
+
+    elif query.data.startswith("favserv_"):
+        res = query.data.replace("favserv_", "")
+        res = res.split("-")
+        nome = res[1]
+        id = res[0]
+        price = res[2]
+        cursor.execute("CREATE TABLE IF NOT EXISTS fav (userid INT, servico VARCHAR(20), pais VARCHAR(20), servicoId VARCHAR(20), price FLOAT)")
+        cursor.execute("SELECT servico FROM fav WHERE userid = ? AND servico = ?", (update.effective_user.id, nome))
+        data = cursor.fetchone()
+
+        if data:
+            cursor.execute(f"UPDATE fav SET servico = {nome} WHERE userid = {update.effective_user.id}")
+        else:
+            cursor.execute(f"INSERT INTO fav VALUES (?, ?, ?, ?, ?)", (update.effective_user.id , nome, "None", id, price))
+        con.commit()
+
+        await update.callback_query.edit_message_text("🌟 Serviço favoritado com sucesso")
+        time.sleep(3.5)
+        await start(update, context)
+    elif query.data.startswith("favorito_serv"):
+        cursor.execute("SELECT servico, price FROM fav WHERE userid = ?", (update.effective_user.id,))
+        data = cursor.fetchall()
+
+        txt = "🌟 Serviços Favoritados:\n\n"
+        keyboard = [
+            [InlineKeyboardButton("👟 Voltar ao menu Start", callback_data="exit")]
+        ]
+        markup = InlineKeyboardMarkup(keyboard)
+
+        if data:
+            for servico, price in data:
+                if servico != "None":
+                    txt += f"📱 **Nome do Serviço**: `{servico}`\n\n💲 Preço: *{price:.2f}*\n\n\n\n"
+                else:
+                    txt = "❌ Não há serviços favoritados"
+            if update.message:
+                await update.message.reply_text(txt, parse_mode="Markdown", reply_markup=markup)
+            else:
+                await update.callback_query.edit_message_text(txt, parse_mode="Markdown", reply_markup=markup)
+        else:
+            txt = "❌ Você ainda não tem nenhum serviço favoritado."
+            if update.message:
+                await update.message.reply_text(txt)
+            else:
+                await update.callback_query.edit_message_text(txt)
+    elif query.data.startswith("favorito_pais"):
+        cursor.execute("SELECT pais FROM fav WHERE userid = ?", (update.effective_user.id,))
+        data = cursor.fetchall()
+        print(data)
+
+        txt = "🌟 Serviços Favoritados:\n\n"
+        keyboard = [
+            [InlineKeyboardButton("👟 Voltar ao menu Start", callback_data="exit")]
+        ]
+        markup = InlineKeyboardMarkup(keyboard)
+
+        if data:
+            for da in data:
+                if da[0] != "None":
+                    txt += f"📱 **Codigo do Pais**: `{da[0]}`\n\n"
+                else:
+                    txt = "❌ *Você ainda não tem nenhum país favoritado.* Adicione países aos seus favoritos para acessá-los rapidamente"
+
+                    break
+            if update.message:
+                await update.message.reply_text(txt, parse_mode="Markdown", reply_markup=markup)
+            else:
+                await update.callback_query.edit_message_text(txt, parse_mode="Markdown", reply_markup=markup)
+        else:
+            txt = "❌ *Você ainda não tem nenhum país favoritado.* Adicione países aos seus favoritos para acessá-los rapidamente."
+            if update.message:
+                await update.message.reply_text(txt, parse_mode="Markdown")
+            else:
+                await update.callback_query.edit_message_text(txt, parse_mode="Markdown")
+
+    elif query.data.startswith("fav_pais"):
+        print(query.data)
+        res = query.data.replace("fav_pais", "")
+        res = res.split("-")
         
+        code = res[0]
+
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS fav (
+                userid INT,
+                servico VARCHAR(20),
+                pais VARCHAR(20),
+                servicoId VARCHAR(20),
+                price FLOAT
+            )
+        """)
+        
+        # Verifica se o país já foi favoritado
+        cursor.execute("SELECT pais FROM fav WHERE userid = ? AND pais = ?", (update.effective_user.id, code))
+        data = cursor.fetchone()
+
+        if not data:
+            cursor.execute("INSERT INTO fav VALUES (?, ?, ?, ?, ?)", (update.effective_user.id, "None", code, "None", 0.0))
+            con.commit()
+            await update.callback_query.edit_message_text("🌟 *País favoritado com sucesso!* Agora você pode acessar facilmente este país a partir da seção de favoritos.")
+        else:
+            await update.callback_query.edit_message_text("✅ *País já está nos seus favoritos!* Você já adicionou este país anteriormente. Para visualizar ou gerenciar seus favoritos, acesse a seção correspondente.", parse_mode="Markdown")
+
+        time.sleep(3.5)
+        await start(update, context)
+    elif query.data.startswith("setpais_"):
+        data = cursor.execute("SELECT * FROM user WHERE userid = ?", (update.effective_user.id,))
+        data = data.fetchone()
+        res = query.data.replace("setpais_", "")
+        pais_id = res
+
+        if data:
+            cursor.execute(f"UPDATE user SET pais = ? WHERE userid = ?", (pais_id, update.effective_user.id))
+        else:
+            cursor.execute("INSERT INTO user VALUES (?, ?, ?, ?)", (update.effective_user.id, pais_id, "None", 0.00))
+        await update.callback_query.edit_message_text("✅ *País definido como padrão com sucesso!*A partir de agora, esse país será selecionado automaticamente nas suas próximas compras. Você pode alterá-lo a qualquer momento escolhendo outro país na lista.", parse_mode="Markdown")
+        time.sleep(3.5)
+        await start(update, context)
+        con.commit()
+    elif query.data.startswith("setserv_"):
+        data = cursor.execute("SELECT * FROM user WHERE userid = ?", (update.effective_user.id))
+        data = data.fetchone()
+        res = query.data.replace("setserv_", "")
+        se_id = res
+
+        if data:
+            cursor.execute(f"UPDATE user SET service = ? WHERE userid = ?", (service_id, update.effective_user.id))
+        else:
+            cursor.execute("INSERT INTO user VALUES (?, ?, ?, ?)", (update.effective_user.id, service_id, "None", 0.00))
+        await update.callback_query.edit_message_text("✅ *Serviço definido como padrão com sucesso!* A partir de agora, este serviço será selecionado automaticamente nas suas próximas compras. Você pode trocá-lo quando quiser, escolhendo outro serviço na lista. 📱", parse_mode="Markdown")
+        time.sleep(3.5)
+        await start(update, context)
+        con.commit()

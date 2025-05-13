@@ -10,8 +10,7 @@ async def drop(update: Update, context: ContextTypes.DEFAULT_TYPE):
             userid INTEGER PRIMARY KEY,
             service TEXT DEFAULT 'None',
             pais TEXT DEFAULT 'None',
-            saldo FLOAT DEFAULT 0.0,
-            cpf TEXT DEFAULT 'None'
+            saldo FLOAT DEFAULT 0.0
         )
     """)
     cursor.execute("CREATE TABLE IF NOT EXISTS numeros (userid INT, numero VARCHAR(20), code VARCHAR(20))")

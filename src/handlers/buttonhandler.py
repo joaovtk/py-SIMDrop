@@ -39,7 +39,7 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             keyboard.append([
                 InlineKeyboardButton(
                     f"{da['serviceDescription']}",
-                    callback_data=f"serv_{da['service']}-{da["serviceDescription"]}-{da["price"]}"
+                    callback_data=f"serv_{da['service']}-{da['serviceDescription']}-{da['price']}"
                 )
             ])
 

@@ -1,6 +1,6 @@
 from flask import Flask, request
 from utils.database import con, cursor
-from config import TOKEN_TELEGRAM
+from config import TOKEN_TELEGRAM, HOST, PORT
 import requests
 
 app = Flask(__name__)
@@ -46,4 +46,4 @@ def test():
     return "Test"
 
 def run_webhook():
-    app.run(host='0.0.0.0', port=5000)
+    app.run(host=HOST, port=PORT)

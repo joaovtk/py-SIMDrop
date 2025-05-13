@@ -41,5 +41,9 @@ def pixup_webhook():
             print(f"⚠️ Usuário com userid {userid} não encontrado no banco.")
     return '', 200
 
+@app.route("/test", methods=["GET"])
+def test():
+    return "Test"
+
 def run_webhook():
     app.run(host='0.0.0.0', port=5000)
